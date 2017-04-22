@@ -50,6 +50,10 @@ task_context "VelocityProvider" do
     input_port('pressure_sensor_samples', '/base/samples/RigidBodyState').
             needs_reliable_connection
 
+    # Orientation samples
+    input_port('orientation_samples', '/base/samples/RigidBodyState').
+            needs_reliable_connection
+
 
     #******************************
     #******* Output Ports *********
@@ -71,6 +75,7 @@ task_context "VelocityProvider" do
         align_port("dvl_velocity_samples", 0.2)
         align_port("imu_sensor_samples", 0.01)
         align_port("pressure_sensor_samples", 0.01)
+        align_port("orientation_samples", 0.01)
         max_latency(0.05)
     end
 

@@ -19,6 +19,12 @@ VelocityProvider::~VelocityProvider()
 {
 }
 
+void VelocityProvider::orientation_samplesTransformerCallback(const base::Time &ts, const ::base::samples::RigidBodyState &orientation_sample)
+{
+    current_orientation = orientation_sample;
+    velocity_filter->updateOrientation(current_orientation.orientation);
+}
+
 void VelocityProvider::dvl_velocity_samplesTransformerCallback(const base::Time &ts, const ::base::samples::RigidBodyState &dvl_velocity_samples_sample)
 {
     // receive sensor to body transformation
@@ -217,6 +223,7 @@ bool VelocityProvider::configureHook()
 
     current_angular_velocity = Eigen::Vector3d::Zero();
     last_sample_time = base::Time();
+    current_orientation.invalidate();
 
     last_state = PRE_OPERATIONAL;
     new_state = RUNNING;
@@ -251,9 +258,14 @@ void VelocityProvider::updateHook()
         velocity_sample.velocity = current_state.velocity;
         velocity_sample.position.z() = current_state.z_position(0);
         velocity_sample.angular_velocity = current_angular_velocity;
+        if(current_orientation.hasValidOrientation())
+            velocity_sample.orientation = current_orientation.orientation;
+        else
+            velocity_sample.orientation = base::Orientation::Identity();
         velocity_sample.cov_velocity = state_cov.block(0,0,3,3);
         velocity_sample.cov_position(2,2) = state_cov(3,3);
         velocity_sample.cov_angular_velocity = _cov_angular_velocity.value();
+        velocity_sample.cov_orientation = current_orientation.cov_orientation;
         velocity_sample.time = current_sample_time;
         velocity_sample.targetFrame = _target_frame.value();
         velocity_sample.sourceFrame = _target_frame.value();

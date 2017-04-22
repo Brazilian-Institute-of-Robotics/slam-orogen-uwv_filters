@@ -41,6 +41,7 @@ namespace uwv_kalman_filters {
         base::Time last_sample_time;
         States last_state;
         States new_state;
+        base::samples::RigidBodyState current_orientation;
 
 
         virtual void dvl_velocity_samplesTransformerCallback(const base::Time &ts, const ::base::samples::RigidBodyState &dvl_velocity_samples_sample);
@@ -50,6 +51,8 @@ namespace uwv_kalman_filters {
         virtual void body_effortsTransformerCallback(const base::Time &ts, const ::base::commands::LinearAngular6DCommand &body_efforts);
 
         virtual void pressure_sensor_samplesTransformerCallback(const base::Time &ts, const ::base::samples::RigidBodyState &pressure_samples_sample);
+        
+        virtual void orientation_samplesTransformerCallback(const base::Time &ts, const ::base::samples::RigidBodyState &orientation_sample);
 
         void predictionStep(const base::Time& sample_time);
 
